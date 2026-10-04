@@ -173,10 +173,18 @@ print.monteriskr_fit <- function(x, ...) {
   priors_df <- as.data.frame(x$priors[, c("prior", "class", "coef", "group")])
   print.data.frame(priors_df, row.names = FALSE)
   cat("\nModel Fit Summary:\n")
-  print(x$brmsfit)
+
+  brms_lines <- utils::capture.output(print(x$brmsfit, ...))
+  data_lines <- grep("^\\s*Data:", brms_lines)
+  if (length(data_lines) > 0) {
+    brms_lines <- brms_lines[-data_lines]
+  }
+  cat(brms_lines, sep = "\n")
+  cat("\n")
 
   invisible(x)
 }
+
 
 #' @export
 summary.monteriskr_fit <- function(object, ...) {
