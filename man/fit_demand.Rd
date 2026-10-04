@@ -9,6 +9,7 @@ fit_demand(
   outcome,
   covariates = NULL,
   capacity = NULL,
+  prior = brms::prior(normal(0, 1), class = "b"),
   chains = 2,
   iter = 1000,
   seed = NULL,
@@ -23,6 +24,10 @@ fit_demand(
 \item{covariates}{Optional character vector of covariate column names.}
 
 \item{capacity}{Optional character string (column name in \code{data}) or single positive number.}
+
+\item{prior}{Prior specification passed to \code{brms::brm()}. Defaults to
+\code{brms::prior(normal(0, 1), class = "b")}, placing a weakly informative
+\eqn{N(0, 1)} prior on regression coefficients. Set to \code{NULL} for flat priors.}
 
 \item{chains}{Number of Markov chains for MCMC sampling. Default is 2.}
 
@@ -47,18 +52,35 @@ Fits a Bayesian negative binomial regression model to historical event
 attendance data using \code{brms}. When venue capacity is specified, events where
 attendance reached capacity are modeled as right-censored observations.
 }
+\details{
+By default, \code{fit_demand()} applies a weakly informative \eqn{N(0, 1)} prior on
+regression coefficients (\code{class = "b"}). The intercept uses \code{brms}'s default
+\code{student_t(3, y_median, 2.5)} prior, and the negative binomial shape parameter
+\eqn{\phi} uses \code{inv_gamma(0.4, 0.3)}.
+
+When capacity censoring is applied, observations where outcome equals or exceeds
+capacity are right-censored. For these rows, \code{outcome - 1} is passed to \code{brms} so
+that \code{neg_binomial_2_lccdf} evaluates \eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
+The original outcome is retained in the returned fit object data.
+}
 \examples{
 \donttest{
-data(example_events)
-fit <- fit_demand(
-  data = example_events,
-  outcome = "attendance",
-  covariates = "marketing",
-  capacity = 250,
-  chains = 1,
-  iter = 500,
-  seed = 123
-)
+# Use pre-compiled fit fixture if available to avoid long Stan compilation
+fit_file <- system.file("extdata", "example_fit.rds", package = "monteriskr")
+if (file.exists(fit_file)) {
+  fit <- readRDS(fit_file)
+} else {
+  data(example_events)
+  fit <- fit_demand(
+    data = example_events,
+    outcome = "attendance",
+    covariates = "marketing",
+    capacity = 250,
+    chains = 1,
+    iter = 100,
+    seed = 123
+  )
+}
 print(fit)
 }
 }
