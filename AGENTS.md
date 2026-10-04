@@ -18,3 +18,7 @@ No Shiny, no cmdstanr, no golem in v0.1.
 - Do not modify statistical model code without explaining the change.
 - Do not call options() or set.seed() globally inside package functions.
 - Commit to git after each working step.
+- Read PLAN.md at the start of every session. Update a milestone's
+  status only when it is finished, and never mark one done until its
+  check output has been shown to me.
+- Never run git push. I will push manually.
