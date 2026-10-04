@@ -1,0 +1,25 @@
+Package: monteriskr
+Title: Bayesian Demand Modeling and Monte Carlo Risk Analysis for Events
+Version: 0.0.0.9000
+Authors@R: 
+    person("Aryaan", "Swain", email = "aryaanswain@gmail.com", role = c("aut", "cre"))
+Description: Fits Bayesian negative binomial demand models with capacity 
+    censoring using brms, simulates posterior predictive demand, and 
+    computes Monte Carlo risk metrics for event planning scenarios.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+LazyData: true
+Imports:
+    brms,
+    posterior,
+    stats,
+    utils
+Suggests:
+    ggplot2,
+    knitr,
+    rmarkdown,
+    rstan,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

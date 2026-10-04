@@ -1,0 +1,7 @@
+^AGENTS\.md$
+^\.agents$
+^data-raw$
+^\.git$
+^\.gitignore$
+^monteriskr_.*\.tar\.gz$
+^\.Rcheck$
