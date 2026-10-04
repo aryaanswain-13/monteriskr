@@ -3,5 +3,6 @@
 ^data-raw$
 ^\.git$
 ^\.gitignore$
-^monteriskr_.*\.tar\.gz$
-^\.Rcheck$
+.*\.tar\.gz$
+.*\.Rcheck$
+^\.DS_Store$

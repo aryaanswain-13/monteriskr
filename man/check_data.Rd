@@ -30,6 +30,11 @@ collinearity, and sample size warnings/errors.
 }
 \examples{
 data(example_events)
-check_res <- check_data(example_events, outcome = "attendance", covariates = "marketing", capacity = 250)
+check_res <- check_data(
+  example_events,
+  outcome = "attendance",
+  covariates = "marketing",
+  capacity = 250
+)
 check_res
 }

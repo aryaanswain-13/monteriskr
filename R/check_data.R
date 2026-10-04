@@ -19,8 +19,14 @@
 #' @export
 #' @examples
 #' data(example_events)
-#' check_res <- check_data(example_events, outcome = "attendance", covariates = "marketing", capacity = 250)
+#' check_res <- check_data(
+#'   example_events,
+#'   outcome = "attendance",
+#'   covariates = "marketing",
+#'   capacity = 250
+#' )
 #' check_res
+
 check_data <- function(data, outcome, covariates = NULL, capacity = NULL) {
   errors <- character(0)
   warnings <- character(0)
