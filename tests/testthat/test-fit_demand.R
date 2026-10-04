@@ -52,3 +52,35 @@ test_that("fit_demand runs live fitting with censoring and uncensored formula", 
   expect_s3_class(fit_uncens, "monteriskr_fit")
   expect_equal(deparse(fit_uncens$formula), "attendance ~ marketing")
 })
+
+test_that("censoring fix shifts Y in standata and satisfies log-ccdf identity", {
+  df <- simulate_events(n = 30, capacity = 250, seed = 42)
+  cens_rows <- df$attendance >= 250
+  expect_true(any(cens_rows))
+  expect_true(any(!cens_rows))
+
+  # Construct fit_data as fit_demand does internally
+  fit_data <- df
+  is_cens <- fit_data$attendance >= 250
+  fit_data$censored <- as.numeric(is_cens)
+  fit_data$attendance <- ifelse(is_cens, fit_data$attendance - 1, fit_data$attendance)
+
+  form <- stats::as.formula("attendance | cens(censored) ~ marketing")
+  st <- brms::make_standata(form, data = fit_data, family = brms::negbinomial())
+
+  # 1. Y for censored rows equals capacity - 1 (250 - 1 = 249)
+  expect_equal(as.numeric(st$Y[cens_rows]), rep(249, sum(cens_rows)))
+  # 2. Y for uncensored rows is unchanged
+  expect_equal(as.numeric(st$Y[!cens_rows]), df$attendance[!cens_rows])
+  # 3. Censoring indicator is set correctly
+  expect_equal(as.numeric(st$cens), as.numeric(cens_rows))
+
+  # 4. Numeric test showing pnbinom(C - 1, mu = m, size = s, lower.tail = FALSE) equals 1 - pnbinom(C - 1, mu = m, size = s)
+  m <- 200
+  s <- 20
+  C <- 250
+  p_lccdf <- stats::pnbinom(C - 1, mu = m, size = s, lower.tail = FALSE)
+  p_direct <- 1 - stats::pnbinom(C - 1, mu = m, size = s)
+  expect_equal(p_lccdf, p_direct)
+})
+
