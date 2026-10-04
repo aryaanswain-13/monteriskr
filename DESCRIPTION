@@ -12,12 +12,12 @@ Roxygen: list(markdown = TRUE)
 LazyData: true
 Imports:
     brms,
-    posterior,
     stats,
     utils
 Suggests:
     ggplot2,
     knitr,
+    posterior,
     rmarkdown,
     rstan,
     testthat (>= 3.0.0)

@@ -9,7 +9,7 @@
 #' @param covariates Optional character vector of covariate column names.
 #' @param capacity Optional character string (column name in `data`) or single positive number.
 #' @param prior Prior specification passed to `brms::brm()`. Defaults to
-#'   `brms::prior(normal(0, 1), class = "b")`, placing a weakly informative
+#'   `brms::prior_string("normal(0, 1)", class = "b")`, placing a weakly informative
 #'   \eqn{N(0, 1)} prior on regression coefficients. Set to `NULL` for flat priors.
 #' @param chains Number of Markov chains for MCMC sampling. Default is 2.
 #' @param iter Total number of iterations per chain. Default is 1000.
@@ -61,11 +61,12 @@ fit_demand <- function(data,
                        outcome,
                        covariates = NULL,
                        capacity = NULL,
-                       prior = brms::prior(normal(0, 1), class = "b"),
+                       prior = brms::prior_string("normal(0, 1)", class = "b"),
                        chains = 2,
                        iter = 1000,
                        seed = NULL,
                        ...) {
+
   # 1. Run check_data
   check_res <- check_data(data = data, outcome = outcome, covariates = covariates, capacity = capacity)
   if (!check_res$valid) {

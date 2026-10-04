@@ -9,7 +9,7 @@ fit_demand(
   outcome,
   covariates = NULL,
   capacity = NULL,
-  prior = brms::prior(normal(0, 1), class = "b"),
+  prior = brms::prior_string("normal(0, 1)", class = "b"),
   chains = 2,
   iter = 1000,
   seed = NULL,
@@ -26,7 +26,7 @@ fit_demand(
 \item{capacity}{Optional character string (column name in \code{data}) or single positive number.}
 
 \item{prior}{Prior specification passed to \code{brms::brm()}. Defaults to
-\code{brms::prior(normal(0, 1), class = "b")}, placing a weakly informative
+\code{brms::prior_string("normal(0, 1)", class = "b")}, placing a weakly informative
 \eqn{N(0, 1)} prior on regression coefficients. Set to \code{NULL} for flat priors.}
 
 \item{chains}{Number of Markov chains for MCMC sampling. Default is 2.}
