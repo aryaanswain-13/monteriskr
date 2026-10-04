@@ -6,6 +6,7 @@ source("R/fit_demand.R")
 load("data/example_events.rda")
 
 dir.create("tests/testthat/fixtures", recursive = TRUE, showWarnings = FALSE)
+dir.create("inst/extdata", recursive = TRUE, showWarnings = FALSE)
 
 example_fit <- fit_demand(
   data = example_events,
@@ -18,4 +19,6 @@ example_fit <- fit_demand(
   seed = 123
 )
 
-saveRDS(example_fit, file = "tests/testthat/fixtures/example_fit.rds")
+saveRDS(example_fit, file = "tests/testthat/fixtures/example_fit.rds", compress = "xz")
+saveRDS(example_fit, file = "inst/extdata/example_fit.rds", compress = "xz")
+
