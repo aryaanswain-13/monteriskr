@@ -11,7 +11,7 @@ Out of scope: Shiny, cmdstanr, golem, time series, multiple outcomes.
       censored rows), normal(0, 1) prior on coefficients, fixture saved
 - [x] M3 follow-ups: shared helper for the shift, store original data in
       its own slot (not in brmsfit$data), commit everything
-- [ ] M4 simulate_risk()
+- [x] M4 simulate_risk()
 - [ ] M5 risk_summary(), compare_scenarios()
 - [ ] M6 Validation (parameter recovery, with vs. without censoring)
 - [ ] M7 Docs, vignette, README, NEWS, cran-comments, GitHub Actions
