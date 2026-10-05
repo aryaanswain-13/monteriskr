@@ -21,4 +21,4 @@ No Shiny, no cmdstanr, no golem in v0.1.
 - Read PLAN.md at the start of every session. Update a milestone's
   status only when it is finished, and never mark one done until its
   check output has been shown to me.
-- Never run git push. I will push manually.
+- After each committed working step, push to origin main (https://github.com/aryaanswain-13/monteriskr). Never force-push or rewrite pushed history without asking.

@@ -28,7 +28,7 @@ Out of scope: Shiny, cmdstanr, golem, time series, multiple outcomes.
   CVaR is the mean loss at or beyond VaR.
 
 ## Rules
-- Never run git push. always ask before pushing
+- Push to origin main after each committed working step; never force-push without asking.
 - posterior goes back to Imports if any posterior:: call is added.
 
 ## Before CRAN submission
