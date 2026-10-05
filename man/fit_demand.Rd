@@ -66,6 +66,12 @@ that \code{neg_binomial_2_lccdf} evaluates
 \eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
 The original, unshifted data are stored in the \code{data_original} slot of the
 returned fit object.
+
+Sampling starts from data-informed initial values (intercept at the log of the
+mean outcome, coefficients near zero) instead of \code{brms}' random defaults, which
+can fail to initialise for censored count models. This does not change the
+model. Supply \code{init} in \code{...} to override. If no chain produces draws,
+\code{fit_demand()} stops with an error.
 }
 \examples{
 \donttest{

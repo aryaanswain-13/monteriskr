@@ -99,3 +99,40 @@ test_that("censoring fix shifts Y in standata via apply_censoring_shift", {
   p_direct <- 1 - stats::pnbinom(C - 1, mu = m, size = s)
   expect_equal(p_lccdf, p_direct)
 })
+
+test_that("make_inits gives data-informed starting values", {
+  y <- c(120, 150, 180, 200)
+  f <- monteriskr:::make_inits(y, n_coef = 2)
+  i1 <- f()
+  expect_named(i1, c("Intercept", "shape", "b"), ignore.order = TRUE)
+  expect_equal(i1$Intercept, log(mean(y) + 0.5), tolerance = 0.11)
+  expect_length(i1$b, 2)
+  expect_true(i1$shape >= 8 && i1$shape <= 12)
+  # Intercept-only model has no coefficient vector
+  expect_named(monteriskr:::make_inits(y, n_coef = 0)(), c("Intercept", "shape"),
+               ignore.order = TRUE)
+})
+
+test_that("fit_demand errors clearly when no chain produces draws", {
+  df <- simulate_events(n = 30, capacity = 250, seed = 42)
+  testthat::local_mocked_bindings(
+    brm = function(...) list(),
+    nchains = function(x, ...) 0L,
+    .package = "brms"
+  )
+  expect_error(
+    fit_demand(df, "attendance", "marketing", capacity = 250, seed = 1),
+    "Sampling failed"
+  )
+})
+
+test_that("fit_demand survives a seed/data combination that failed to initialise", {
+  skip_on_cran()
+  # Regression: default brms random starts failed for this data and seed,
+  # returning a fit with zero draws.
+  df <- simulate_events(n = 150, capacity = 200, seed = 9)
+  fit <- fit_demand(df, "attendance", c("day_type", "marketing"), capacity = 200,
+                    chains = 2, iter = 1000, seed = 9)
+  expect_equal(brms::nchains(fit$brmsfit), 2)
+  expect_equal(brms::ndraws(fit$brmsfit), 1000)
+})

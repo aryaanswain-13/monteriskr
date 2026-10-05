@@ -24,6 +24,36 @@ apply_censoring_shift <- function(data, outcome, cap_vec) {
 }
 
 
+#' Data-informed starting values for the sampler
+#'
+#' Internal helper. Returns a function suitable for the `init` argument of
+#' `brms::brm()`. Random default starts can place the intercept far below the
+#' data (a log-mean near 1 against counts near 150), which makes the censored
+#' tail probability underflow and the chain fail to initialise. Starting the
+#' intercept at the log of the mean outcome avoids this. A small jitter keeps
+#' chains from starting at identical points. This affects only where sampling
+#' starts, not the model, priors or likelihood.
+#'
+#' @param y Numeric outcome vector as passed to `brms` (after any censoring shift).
+#' @param n_coef Number of non-intercept regression coefficients.
+#' @return A function returning a named list of starting values.
+#' @keywords internal
+make_inits <- function(y, n_coef) {
+  center <- log(mean(y) + 0.5)
+  function() {
+    inits <- list(
+      Intercept = center + stats::runif(1, -0.1, 0.1),
+      shape     = stats::runif(1, 8, 12)
+    )
+    if (n_coef > 0) {
+      # as.array() keeps a single coefficient a length-1 vector for Stan
+      inits$b <- as.array(stats::runif(n_coef, -0.1, 0.1))
+    }
+    inits
+  }
+}
+
+
 #' Fit Bayesian Demand Model with Capacity Censoring
 #'
 #' Fits a Bayesian negative binomial regression model to historical event
@@ -55,6 +85,12 @@ apply_censoring_shift <- function(data, outcome, cap_vec) {
 #' \eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
 #' The original, unshifted data are stored in the `data_original` slot of the
 #' returned fit object.
+#'
+#' Sampling starts from data-informed initial values (intercept at the log of the
+#' mean outcome, coefficients near zero) instead of `brms`' random defaults, which
+#' can fail to initialise for censored count models. This does not change the
+#' model. Supply `init` in `...` to override. If no chain produces draws,
+#' `fit_demand()` stops with an error.
 #'
 #' @return An S3 object of class `"monteriskr_fit"` containing:
 #'   \item{brmsfit}{The fitted `brmsfit` object.}
@@ -150,7 +186,9 @@ fit_demand <- function(data,
   # 3. Retrieve priors for transparency
   brms_priors <- brms::get_prior(formula = form, data = fit_data, family = brms::negbinomial(), prior = prior_to_use)
 
-  # 4. Fit model via brms::brm
+  # 4. Fit model via brms::brm. Starting values are data-informed (see
+  # make_inits()); users can override them with `init` in `...`.
+  n_coef <- ncol(stats::model.matrix(stats::as.formula(paste("~", cov_str)), data = fit_data)) - 1L
   brms_args <- list(
     formula = form,
     data = fit_data,
@@ -158,6 +196,7 @@ fit_demand <- function(data,
     prior = prior_to_use,
     chains = chains,
     iter = iter,
+    init = make_inits(fit_data[[outcome]], n_coef),
     refresh = 0
   )
 
@@ -171,6 +210,18 @@ fit_demand <- function(data,
   }
 
   fit_obj <- do.call(brms::brm, brms_args)
+
+  # brms can return a "successful" fit with no draws when every chain fails to
+  # initialise; surface that instead of handing back an unusable object.
+  n_chains_ok <- brms::nchains(fit_obj)
+  if (n_chains_ok == 0) {
+    stop("Sampling failed: no chain produced draws (see the Stan message above). ",
+         "Try a different `seed`, or supply starting values via `init`.", call. = FALSE)
+  }
+  if (n_chains_ok < chains) {
+    warning(sprintf("Only %d of %d chains produced draws; estimates may be unreliable.",
+                    n_chains_ok, chains), call. = FALSE)
+  }
 
   # Build result list; original unshifted data lives in data_original (not
   # mutated into brmsfit$data).

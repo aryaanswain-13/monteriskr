@@ -13,7 +13,7 @@ Out of scope: Shiny, cmdstanr, golem, time series, multiple outcomes.
       its own slot (not in brmsfit$data), commit everything
 - [x] M4 simulate_risk()
 - [x] M5 risk_summary(), compare_scenarios()
-- [ ] M6 Validation (parameter recovery, with vs. without censoring)
+- [x] M6 Validation (parameter recovery, with vs. without censoring)
 - [ ] M7 Docs, vignette, README, NEWS, cran-comments, GitHub Actions
 - [ ] Stretch: render_report()
 
