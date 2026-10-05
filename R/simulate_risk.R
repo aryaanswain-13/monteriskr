@@ -196,6 +196,6 @@ print.monteriskr_risk <- function(x, ...) {
               format(round(mean(x$total_profit), 1)),
               format(round(stats::quantile(x$total_profit, 0.05, names = FALSE), 1)),
               format(round(stats::quantile(x$total_profit, 0.95, names = FALSE), 1))))
-  cat("Use risk_summary() (coming in M5) for VaR/CVaR.\n")
+  cat("Use risk_summary() for VaR/CVaR.\n")
   invisible(x)
 }
