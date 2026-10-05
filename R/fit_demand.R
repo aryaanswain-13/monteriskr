@@ -1,3 +1,29 @@
+#' Apply Censoring Shift to Fit Data
+#'
+#' Internal helper that prepares a modelling data frame for right-censored
+#' negative binomial regression.  For rows where the outcome equals or exceeds
+#' the capacity vector, the outcome is decremented by one so that
+#' `neg_binomial_2_lccdf` evaluates \eqn{P(D \ge \text{capacity}) =
+#' P(D > \text{capacity} - 1)}.  A `censored` indicator column (0/1) is also
+#' added.
+#'
+#' @param data A `data.frame` containing at least the outcome column.
+#' @param outcome Character; name of the count outcome column.
+#' @param cap_vec Numeric vector of capacity values, one per row of `data`.
+#'
+#' @return A copy of `data` with:
+#'   \item{censored}{Integer 0/1 censoring indicator.}
+#'   \item{outcome column}{Decremented by 1 for right-censored rows.}
+#'
+#' @keywords internal
+apply_censoring_shift <- function(data, outcome, cap_vec) {
+  is_cens <- data[[outcome]] >= cap_vec
+  data$censored <- as.integer(is_cens)
+  data[[outcome]] <- ifelse(is_cens, data[[outcome]] - 1L, data[[outcome]])
+  data
+}
+
+
 #' Fit Bayesian Demand Model with Capacity Censoring
 #'
 #' Fits a Bayesian negative binomial regression model to historical event
@@ -23,9 +49,12 @@
 #' \eqn{\phi} uses `inv_gamma(0.4, 0.3)`.
 #'
 #' When capacity censoring is applied, observations where outcome equals or exceeds
-#' capacity are right-censored. For these rows, `outcome - 1` is passed to `brms` so
-#' that `neg_binomial_2_lccdf` evaluates \eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
-#' The original outcome is retained in the returned fit object data.
+#' capacity are right-censored. The internal helper `apply_censoring_shift()` adds a
+#' `censored` indicator column and decrements the outcome by one for those rows so
+#' that `neg_binomial_2_lccdf` evaluates
+#' \eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
+#' The original, unshifted data are stored in the `data_original` slot of the
+#' returned fit object.
 #'
 #' @return An S3 object of class `"monteriskr_fit"` containing:
 #'   \item{brmsfit}{The fitted `brmsfit` object.}
@@ -35,6 +64,7 @@
 #'   \item{capacity}{Capacity value or column name supplied.}
 #'   \item{priors}{Data frame of priors used by `brms` for this model.}
 #'   \item{check}{Result of `check_data()`.}
+#'   \item{data_original}{The original, unshifted `data` passed to `fit_demand()`.}
 #'
 #' @export
 #' @examples
@@ -88,11 +118,8 @@ fit_demand <- function(data,
     } else {
       cap_vec <- rep(capacity, nrow(fit_data))
     }
-    # Censored indicator: 1 = right-censored (true demand >= capacity), 0 = uncensored
-    is_cens <- fit_data[[outcome]] >= cap_vec
-    fit_data$censored <- as.numeric(is_cens)
-    # Censoring fix: pass outcome - 1 for right-censored rows so neg_binomial_2_lccdf evaluates P(D >= capacity)
-    fit_data[[outcome]] <- ifelse(is_cens, fit_data[[outcome]] - 1, fit_data[[outcome]])
+    # Apply censoring shift via shared helper
+    fit_data <- apply_censoring_shift(fit_data, outcome, cap_vec)
 
     form_str <- sprintf("%s | cens(censored) ~ %s", outcome, cov_str)
   } else {
@@ -145,17 +172,17 @@ fit_demand <- function(data,
 
   fit_obj <- do.call(brms::brm, brms_args)
 
-  # Keep original outcome in stored brmsfit data object
-  fit_obj$data[[outcome]] <- data[[outcome]]
-
+  # Build result list; original unshifted data lives in data_original (not
+  # mutated into brmsfit$data).
   res <- list(
-    brmsfit = fit_obj,
-    formula = form,
-    outcome = outcome,
+    brmsfit    = fit_obj,
+    formula    = form,
+    outcome    = outcome,
     covariates = covariates,
-    capacity = capacity,
-    priors = brms_priors,
-    check = check_res
+    capacity   = capacity,
+    priors     = brms_priors,
+    check      = check_res,
+    data_original = data
   )
 
   class(res) <- "monteriskr_fit"
@@ -192,4 +219,3 @@ summary.monteriskr_fit <- function(object, ...) {
   cat("=== monteriskr Demand Fit Summary ===\n")
   summary(object$brmsfit, ...)
 }
-

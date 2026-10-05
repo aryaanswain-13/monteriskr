@@ -46,6 +46,7 @@ An S3 object of class \code{"monteriskr_fit"} containing:
 \item{capacity}{Capacity value or column name supplied.}
 \item{priors}{Data frame of priors used by \code{brms} for this model.}
 \item{check}{Result of \code{check_data()}.}
+\item{data_original}{The original, unshifted \code{data} passed to \code{fit_demand()}.}
 }
 \description{
 Fits a Bayesian negative binomial regression model to historical event
@@ -59,9 +60,12 @@ regression coefficients (\code{class = "b"}). The intercept uses \code{brms}'s d
 \eqn{\phi} uses \code{inv_gamma(0.4, 0.3)}.
 
 When capacity censoring is applied, observations where outcome equals or exceeds
-capacity are right-censored. For these rows, \code{outcome - 1} is passed to \code{brms} so
-that \code{neg_binomial_2_lccdf} evaluates \eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
-The original outcome is retained in the returned fit object data.
+capacity are right-censored. The internal helper \code{apply_censoring_shift()} adds a
+\code{censored} indicator column and decrements the outcome by one for those rows so
+that \code{neg_binomial_2_lccdf} evaluates
+\eqn{P(D \ge \text{capacity}) = P(D > \text{capacity} - 1)}.
+The original, unshifted data are stored in the \code{data_original} slot of the
+returned fit object.
 }
 \examples{
 \donttest{

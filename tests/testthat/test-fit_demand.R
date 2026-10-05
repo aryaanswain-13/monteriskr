@@ -15,6 +15,16 @@ test_that("fit_demand produces valid monteriskr_fit from fixture", {
   expect_s3_class(fit$brmsfit, "brmsfit")
   expect_s3_class(fit$priors, "brmsprior")
 
+  # data_original must exist and contain the unshifted outcome
+  expect_true(!is.null(fit$data_original))
+  expect_true(is.data.frame(fit$data_original))
+  # All original attendance values should be >= censored rows' brmsfit Y + 1
+  # (i.e. original data is not decremented)
+  cens_rows <- fit$data_original$attendance >= 250
+  if (any(cens_rows)) {
+    expect_true(all(fit$data_original$attendance[cens_rows] >= 250))
+  }
+
   # Test print and summary methods
   expect_output(print(fit), "monteriskr Bayesian Demand Fit")
   expect_output(print(fit), "Outcome: attendance")
@@ -39,6 +49,14 @@ test_that("fit_demand runs live fitting with censoring and uncensored formula", 
   expect_s3_class(fit_cens, "monteriskr_fit")
   expect_equal(deparse(fit_cens$formula), "attendance | cens(censored) ~ marketing")
 
+  # data_original preserved and unshifted
+  expect_true(is.data.frame(fit_cens$data_original))
+  expect_equal(nrow(fit_cens$data_original), nrow(df))
+  cens_rows <- df$attendance >= 300
+  if (any(cens_rows)) {
+    expect_equal(fit_cens$data_original$attendance[cens_rows], df$attendance[cens_rows])
+  }
+
   # Uncensored model
   fit_uncens <- fit_demand(
     data = df,
@@ -53,17 +71,15 @@ test_that("fit_demand runs live fitting with censoring and uncensored formula", 
   expect_equal(deparse(fit_uncens$formula), "attendance ~ marketing")
 })
 
-test_that("censoring fix shifts Y in standata and satisfies log-ccdf identity", {
+test_that("censoring fix shifts Y in standata via apply_censoring_shift", {
   df <- simulate_events(n = 30, capacity = 250, seed = 42)
   cens_rows <- df$attendance >= 250
   expect_true(any(cens_rows))
   expect_true(any(!cens_rows))
 
-  # Construct fit_data as fit_demand does internally
-  fit_data <- df
-  is_cens <- fit_data$attendance >= 250
-  fit_data$censored <- as.numeric(is_cens)
-  fit_data$attendance <- ifelse(is_cens, fit_data$attendance - 1, fit_data$attendance)
+  # Use the shared helper (not a copy of the logic)
+  cap_vec <- rep(250, nrow(df))
+  fit_data <- monteriskr:::apply_censoring_shift(df, "attendance", cap_vec)
 
   form <- stats::as.formula("attendance | cens(censored) ~ marketing")
   st <- brms::make_standata(form, data = fit_data, family = brms::negbinomial())
@@ -83,4 +99,3 @@ test_that("censoring fix shifts Y in standata and satisfies log-ccdf identity", 
   p_direct <- 1 - stats::pnbinom(C - 1, mu = m, size = s)
   expect_equal(p_lccdf, p_direct)
 })
-
