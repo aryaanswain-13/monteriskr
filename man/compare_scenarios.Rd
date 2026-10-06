@@ -31,6 +31,7 @@ events and simulation runs. \code{diff_mean_profit} is the scenario's mean profi
 minus the baseline's mean profit.
 }
 \examples{
+\donttest{
 fit <- readRDS(system.file("extdata", "example_fit.rds", package = "monteriskr"))
 weekend <- data.frame(
   day_type = factor("weekend", levels = c("weekday", "weekend")),
@@ -41,4 +42,5 @@ low  <- simulate_risk(fit, weekend, n_sims = 200, price = 30,
 high <- simulate_risk(fit, weekend, n_sims = 200, price = 50,
                       fixed_cost = 3000, seed = 1)
 compare_scenarios(low_price = low, high_price = high)
+}
 }

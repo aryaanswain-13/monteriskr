@@ -7,3 +7,6 @@
 .*\.Rcheck$
 ^\.DS_Store$
 ^PLAN\.md$
+^README\.Rmd$
+^cran-comments\.md$
+^\.github$

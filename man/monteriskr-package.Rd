@@ -8,6 +8,14 @@
 \description{
 Fits Bayesian negative binomial demand models with capacity censoring using brms, simulates posterior predictive demand, and computes Monte Carlo risk metrics for event planning scenarios.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/aryaanswain-13/monteriskr}
+  \item Report bugs at \url{https://github.com/aryaanswain-13/monteriskr/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Aryaan Swain \email{aryaanswain@gmail.com}
 

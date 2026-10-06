@@ -128,6 +128,7 @@ print.monteriskr_summary <- function(x, digits = 3, ...) {
 #'
 #' @export
 #' @examples
+#' \donttest{
 #' fit <- readRDS(system.file("extdata", "example_fit.rds", package = "monteriskr"))
 #' weekend <- data.frame(
 #'   day_type = factor("weekend", levels = c("weekday", "weekend")),
@@ -138,6 +139,7 @@ print.monteriskr_summary <- function(x, digits = 3, ...) {
 #' high <- simulate_risk(fit, weekend, n_sims = 200, price = 50,
 #'                       fixed_cost = 3000, seed = 1)
 #' compare_scenarios(low_price = low, high_price = high)
+#' }
 compare_scenarios <- function(..., level = 0.95) {
   scenarios <- list(...)
   if (length(scenarios) == 1 && is.list(scenarios[[1]]) &&
