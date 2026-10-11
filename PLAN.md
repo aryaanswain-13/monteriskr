@@ -14,7 +14,7 @@ Out of scope: Shiny, cmdstanr, golem, time series, multiple outcomes.
 - [x] M4 simulate_risk()
 - [x] M5 risk_summary(), compare_scenarios()
 - [x] M6 Validation (parameter recovery, with vs. without censoring)
-- [ ] M7 Docs, vignette, README, NEWS, cran-comments, GitHub Actions
+- [x] M7 Docs, vignette, README, NEWS, cran-comments, GitHub Actions
 - [ ] Stretch: render_report()
 
 ## Key decisions
