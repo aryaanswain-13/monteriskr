@@ -31,7 +31,14 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          # BH, RcppEigen, StanHeaders, RcppParallel are needed to compile Stan
+          # models at test time (rstan only links against them at install time)
+          extra-packages: |
+            any::rcmdcheck
+            any::BH
+            any::RcppEigen
+            any::StanHeaders
+            any::RcppParallel
           needs: check
       - uses: r-lib/actions/check-r-package@v2
         with:
