@@ -19,6 +19,7 @@ jobs:
         config:
           - {os: macos-latest,  r: 'release'}
           - {os: ubuntu-latest, r: 'release'}
+          - {os: windows-latest, r: 'release'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -31,15 +32,14 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # BH, RcppEigen, StanHeaders, RcppParallel are needed to compile Stan
-          # models at test time (rstan only links against them at install time)
-          extra-packages: |
-            any::rcmdcheck
-            any::BH
-            any::RcppEigen
-            any::StanHeaders
-            any::RcppParallel
+          extra-packages: any::rcmdcheck
           needs: check
       - uses: r-lib/actions/check-r-package@v2
+        env:
+          # Run tests the way CRAN does: tests that compile and fit Stan models
+          # use skip_on_cran() and are skipped here (they are run locally). To run
+          # them on CI, set this to "true" and add any::BH, any::RcppEigen,
+          # any::StanHeaders and any::RcppParallel to extra-packages above.
+          NOT_CRAN: "false"
         with:
           upload-snapshots: true
