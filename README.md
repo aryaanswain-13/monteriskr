@@ -63,6 +63,43 @@ A data frame with one row per past event:
 At least 8 rows are required (20 or more recommended). Rows where attendance
 equals capacity are treated as sold out. Do not name a column `censored`.
 
+### Example: a college fest committee
+
+`past_events.csv`, one row per past event:
+
+| event | day_type | marketing_k | venue_capacity | attendance |
+|---|---|---|---|---|
+| Freshers Night | weekend | 4.0 | 300 | 300 |
+| Quiz Evening | weekday | 0.5 | 120 | 78 |
+| Guest Lecture | weekday | 1.0 | 120 | 95 |
+| Dance Night | weekend | 2.5 | 300 | 300 |
+
+```r
+past <- read.csv("past_events.csv")
+fit  <- fit_demand(past, outcome = "attendance",
+                   covariates = c("day_type", "marketing_k"),
+                   capacity = "venue_capacity")
+```
+
+Freshers Night recorded 300 with capacity 300, so it counts as sold out: true
+demand was *at least* 300. The model uses that as a lower bound instead of
+treating 300 as the exact demand. Columns the model is not told about (here
+`event`) are ignored.
+
+The planned events go in a second file with the same covariate columns and no
+outcome (`day_type`, `marketing_k`, `venue_capacity`), and the category labels
+must match the historical data exactly (`weekday` / `weekend`).
+
+### Scale your numeric covariates
+
+The default prior is `normal(0, 1)` on each coefficient, which is only weakly
+informative *per unit of the covariate*: it assumes a one-unit change shifts
+log-demand by roughly 2 or less. Use units where that is plausible, for example
+marketing spend in thousands of rupees (as above) or standardised to mean 0 and
+standard deviation 1. With raw rupees the prior becomes effectively flat (sampling
+can be slow or unstable); with very coarse units (such as lakhs) it can shrink a
+real effect. You can change the prior with the `prior` argument of `fit_demand()`.
+
 ## Functions
 
 | Function | Purpose |
