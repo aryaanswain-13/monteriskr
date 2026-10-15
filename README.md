@@ -124,6 +124,34 @@ shape parameter overestimated by about 10). With almost no sell-outs the two
 models agreed. The script is in `data-raw/validation.R`; results ship in
 `inst/extdata/validation_results.rds`.
 
+## Check the fit, and known limitations
+
+Always check the sampler before trusting a fit:
+
+```r
+np <- brms::nuts_params(fit$brmsfit)
+sum(np$Value[np$Parameter == "divergent__"])   # want 0
+max(brms::rhat(fit$brmsfit), na.rm = TRUE)     # want below 1.01
+```
+
+* **Mostly sold-out history.** Sold-out events only tell the model that demand
+  was *at least* capacity. If most of your events sold out, there is little to
+  learn from, estimates are weakly determined, and the sampler can produce many
+  divergent transitions. In tests on real college football attendance, a team that
+  sold out 65% to 98% of the time (depending on how "sold out" was defined) gave
+  hundreds of divergences; a team at 44% fit cleanly, but one at 47% did not, so
+  there is no safe threshold. If diagnostics are bad, try fewer covariates, more
+  iterations, or `control = list(adapt_delta = 0.95)` (passed on to `brms`).
+* **What counts as "sold out".** The package treats `attendance >= capacity` as
+  sold out. If "full" in your data really means 98-99% of listed capacity, the
+  model will treat those games as unconstrained and tend to over-predict sell-outs.
+  You can set capacity to an effective value (e.g. 98% of listed capacity).
+* **No time trend or repeated-venue structure.** Games are treated as exchangeable
+  given the covariates, so a drift in attendance over seasons is not captured
+  unless you add a covariate for it.
+* **Covariates must vary.** A covariate that is constant in your data is rejected
+  by `check_data()`.
+
 ## Scope (v0.1)
 
 One count outcome, covariates, optional capacity censoring. No time-series

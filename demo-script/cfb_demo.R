@@ -90,8 +90,10 @@ compare_scenarios(morning_kickoffs = r_early, afternoon_kickoffs = r_late)
 
 # Notes for discussion:
 # * Teams that almost always sell out (e.g. Wisconsin, 65%+) give the model little
-#   to learn from, and very large counts can make the sampler struggle (many
-#   divergent transitions for some teams). Check diagnostics every time.
+#   to learn from, and the sampler struggled (hundreds of divergent transitions;
+#   one team at ~47% sold out did too). Arkansas, with similarly large crowds and
+#   ~44% sold out, fit cleanly, so crowd size alone is not the cause. Check
+#   diagnostics every time.
 # * The model tends to over-predict sell-outs here: "full" in this data often
 #   means 98-99% of the listed capacity, not exactly 100%.
 

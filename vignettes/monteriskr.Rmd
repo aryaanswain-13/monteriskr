@@ -69,6 +69,22 @@ The coefficients are on the log scale: a weekend event has roughly
 `exp(0.4)`, about 1.5 times, the expected demand of a weekday event, all else
 equal. The default prior is `normal(0, 1)` on the coefficients.
 
+### Check the fit before trusting it
+
+Look at the sampler diagnostics every time. Divergent transitions or a large Rhat
+mean the posterior, and everything simulated from it, may be unreliable.
+
+```{r diagnostics}
+np <- brms::nuts_params(fit$brmsfit)
+c(divergences = sum(np$Value[np$Parameter == "divergent__"]),   # want 0
+  max_rhat    = round(max(brms::rhat(fit$brmsfit), na.rm = TRUE), 3))  # want < 1.01
+```
+
+If they are bad, try fewer covariates, more iterations, or a higher
+`adapt_delta` (for example `fit_demand(..., control = list(adapt_delta = 0.95))`).
+This matters most when almost every past event sold out: those rows say only that
+demand was at least capacity, so there is little for the model to learn from.
+
 ## Simulating a plan
 
 Describe the planned events as a data frame with the same covariate columns.
@@ -154,3 +170,10 @@ were excluded for both models and are counted in the stored results.
 * Risk comes from posterior and demand uncertainty only; prices and costs are
   fixed inputs.
 * `total_profit` sums profit over the events in `newdata`.
+* Mostly sold-out histories are weakly informative and can make the sampler
+  struggle (see "Check the fit" above); there is no safe sell-out threshold.
+* "Sold out" means `attendance >= capacity`. If a full house in your data is
+  really 98-99% of listed capacity, consider setting an effective capacity,
+  otherwise the model will tend to over-predict sell-outs.
+* There is no time trend: attendance drifting over seasons is not captured unless
+  you add a covariate for it.
