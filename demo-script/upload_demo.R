@@ -8,6 +8,9 @@
 #   4. Optionally pick a second CSV of PLANNED events (same covariate columns,
 #      no attendance). Cancel it to use your 5 most recent events as the plan.
 #
+# Sample files to try: demo-script/sample-data/fest_past.csv (+ fest_plan.csv as the plan;
+# outcome attendance, covariates day_type + marketing_k, capacity venue_capacity).
+#
 # The first model fit compiles Stan and takes about a minute.
 # Prices and costs below are ASSUMPTIONS you set; the data does not contain them.
 # ---------------------------------------------------------------------------
