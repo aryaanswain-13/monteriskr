@@ -204,7 +204,10 @@ graphics::hist(risk$total_profit, breaks = 40, col = "grey85", border = "white",
 graphics::abline(v = mean(risk$total_profit), lwd = 2)
 
 # ---- Step 9: a what-if comparison -------------------------------------------
-num_covs <- COVARIATES[vapply(cov_info[COVARIATES], function(z) z$type == "numeric", logical(1))]
+# Only covariates that vary continuously make sense to shift by +1 standard deviation
+# (a yes/no flag would be pushed to impossible values like 1.4).
+is_cont <- function(v) cov_info[[v]]$type == "numeric" && length(unique(raw[[v]])) > 2
+num_covs <- COVARIATES[vapply(COVARIATES, is_cont, logical(1))]
 if (length(num_covs)) {
   v <- num_covs[1]
   up <- plan_ready; up[[v]] <- up[[v]] + 1     # +1 standard deviation
@@ -214,6 +217,8 @@ if (length(num_covs)) {
               v, cov_info[[v]]$sd))
   cat("(Costs of making that change are NOT included; add them to fixed_cost to compare fairly.)\n")
   print(compare_scenarios(as_planned = risk, plus_1sd = r_up))
+} else {
+  cat("\nNo continuous covariate to run a what-if on (yes/no flags and categories are skipped).\n")
 }
 
 # ---- Save results -----------------------------------------------------------
