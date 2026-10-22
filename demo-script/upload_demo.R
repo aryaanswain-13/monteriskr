@@ -15,8 +15,13 @@
 # Prices and costs below are ASSUMPTIONS you set; the data does not contain them.
 # ---------------------------------------------------------------------------
 
-# ---- Settings (edit these; leave NULL to be asked) -------------------------
-cfg <- function(name, default) if (exists(name, inherits = TRUE)) get(name) else default
+# ---- Settings (edit the prices/costs below; the rest is asked for) -------------
+# Settings are only read from options(monteriskr.demo = list(...)) (used for testing);
+# earlier answers left in your R session are never reused, so every run asks fresh.
+cfg <- function(name, default) {
+  s <- getOption("monteriskr.demo")
+  if (!is.null(s) && !is.null(s[[name]])) s[[name]] else default
+}
 
 CSV_PATH    <- cfg("CSV_PATH",    NULL)   # past events CSV; NULL = file picker
 PLAN_PATH   <- cfg("PLAN_PATH",   NULL)   # planned events CSV; NULL = ask / use recent
