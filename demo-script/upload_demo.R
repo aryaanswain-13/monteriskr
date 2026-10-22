@@ -55,17 +55,28 @@ ask_one <- function(title, choices, none = FALSE) {
 }
 if (is.null(OUTCOME))
   OUTCOME <- ask_one("Which column is the outcome (attendance count)?", names(raw))
-if (is.null(COVARIATES)) {
-  if (!interactive()) stop("Set COVARIATES in the settings at the top.")
-  COVARIATES <- utils::select.list(setdiff(names(raw), OUTCOME), multiple = TRUE,
-                                   title = "Covariates (columns that may drive attendance)")
-}
+# Capacity is asked before the covariates, so it can be left out of the covariate menu.
 if (is.null(CAPACITY)) {
   pick <- ask_one("Capacity: choose a column, or (none)", setdiff(names(raw), OUTCOME), none = TRUE)
   CAPACITY <- if (is.null(pick)) "none" else pick
 }
 if (identical(CAPACITY, "none")) CAPACITY <- NULL
+cap_col <- if (is.character(CAPACITY) && CAPACITY %in% names(raw)) CAPACITY else NULL
+if (is.null(COVARIATES)) {
+  if (!interactive()) stop("Set COVARIATES in the settings at the top.")
+  COVARIATES <- utils::select.list(setdiff(names(raw), c(OUTCOME, cap_col)), multiple = TRUE,
+                                   title = "Covariates (columns that may drive attendance)")
+}
 stopifnot(OUTCOME %in% names(raw), all(COVARIATES %in% names(raw)))
+if (any(COVARIATES %in% c(OUTCOME, cap_col)))
+  stop("The outcome and the capacity column cannot also be covariates: ",
+       paste(intersect(COVARIATES, c(OUTCOME, cap_col)), collapse = ", "), ". Remove them and run again.")
+for (v in COVARIATES) {
+  x <- raw[[v]]
+  if (is.character(x) && length(unique(x)) > max(10, 0.5 * nrow(raw)))
+    stop("'", v, "' looks like a label or ID (", length(unique(x)), " different values in ", nrow(raw),
+         " rows), so it can't explain attendance. Remove it from the covariates and run again.")
+}
 cap_is_col <- is.character(CAPACITY) && CAPACITY %in% names(raw)
 cat(sprintf("\nOutcome: %s | Covariates: %s | Capacity: %s\n", OUTCOME,
             if (length(COVARIATES)) paste(COVARIATES, collapse = ", ") else "(none)",
