@@ -7,7 +7,7 @@
 Bayesian demand modelling and Monte Carlo risk analysis for events.
 
 Event attendance is a count that is capped by venue capacity. `monteriskr` fits a
-negative binomial demand model with [brms](https://paul-buerkner.github.io/brms/),
+negative binomial demand model with [brms](https://paulbuerkner.com/brms/),
 treats sold-out events as **right-censored** (true demand was at least capacity),
 simulates profit from the posterior, and reports risk metrics (VaR, CVaR, loss
 probability) for a plan or for several alternative plans.
