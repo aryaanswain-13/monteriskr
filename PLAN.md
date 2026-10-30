@@ -32,7 +32,7 @@ Out of scope: Shiny, cmdstanr, golem, time series, multiple outcomes.
 - posterior goes back to Imports if any posterior:: call is added.
 
 ## Before CRAN submission
-- [ ] Full check with network checks on (win-builder, R-hub)
+- [x] Full check with network checks on (win-builder R-devel: 1 NOTE, new submission; R-hub not run)
 - [ ] Maintainer name and email confirmed
-- [ ] Repo public, URL and BugReports in DESCRIPTION
-- [ ] Package name availability confirmed
+- [x] Repo public, URL and BugReports in DESCRIPTION
+- [x] Package name availability confirmed (free on CRAN, 2026-10-30)
