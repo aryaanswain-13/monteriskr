@@ -1,6 +1,6 @@
-# monteriskr 0.0.0.9000
+# monteriskr 0.1.0
 
-First development release.
+First CRAN release.
 
 * `simulate_events()` generates synthetic event data; `example_events` is a
   bundled example.

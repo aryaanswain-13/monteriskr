@@ -5,17 +5,19 @@ This is a first submission.
 ## Test environments
 
 * local macOS (aarch64), R 4.5.0
-* GitHub Actions: see `.github/workflows/R-CMD-check.yaml`
-* win-builder and R-hub: not yet run (to do before submission)
+* win-builder, R-devel (Windows, ucrt)
+* GitHub Actions: macOS, Ubuntu and Windows, R release (see `.github/workflows/R-CMD-check.yaml`)
 
 ## R CMD check results
 
-Local `R CMD check --as-cran`: 0 errors | 0 warnings | 0 notes.
+0 errors | 0 warnings | 1 note
+
+* "New submission": this is the first submission of the package.
 
 ## Notes for the reviewer
 
-* The package fits models with brms, which requires a Stan toolchain. Tests that
+* The package fits models with 'brms', which requires a Stan toolchain. Tests that
   fit a model are wrapped in `skip_on_cran()`; examples and the vignette use a
   pre-computed fit shipped in `inst/extdata/`.
-* The `inst/extdata/validation_results.rds` file is the stored output of a
-  simulation study (`data-raw/validation.R`, not shipped in the built package).
+* `inst/extdata/validation_results.rds` is the stored output of a simulation study
+  (`data-raw/validation.R`, which is not shipped in the built package).
