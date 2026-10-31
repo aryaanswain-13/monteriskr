@@ -3,6 +3,3 @@
 .Rproj.user
 *.tar.gz
 *.Rcheck
-
-# Extract of third-party Kaggle data: licence not checked, so not published
-demo-script/sample-data/cfb_ark.csv
