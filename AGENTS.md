@@ -1,4 +1,4 @@
-# Project: monteriskr (R package, targeting CRAN)
+# Project: monteriskr (R package, targeting CRAN submission)
 
 ## Stack
 R, roxygen2 for docs, testthat (3rd edition) for tests, brms for modeling.
