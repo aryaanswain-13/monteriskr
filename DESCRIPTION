@@ -1,8 +1,10 @@
 Package: monteriskr
 Title: Bayesian Demand Modeling and Monte Carlo Risk Analysis for Events
 Version: 0.1.0
-Authors@R: 
-    person("Aryaan", "Swain", email = "aryaanswain@gmail.com", role = c("aut", "cre", "cph"))
+Authors@R: c(
+    person("Aryaan", "Swain", email = "aryaanswain@gmail.com", role = c("aut", "cre", "cph")),
+    person("Sahil", "Singh", email = "singhsahil2910@gmail.com", role = "aut"),
+    person("Amrit", "Pal", email = "amrit.pal@vit.ac.in", role = "aut"))
 Description: Fits Bayesian negative binomial demand models with capacity 
     censoring using 'brms', simulates posterior predictive demand, and 
     computes Monte Carlo risk metrics for event planning scenarios.

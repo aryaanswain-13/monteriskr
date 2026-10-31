@@ -3,3 +3,7 @@
 .Rproj.user
 *.tar.gz
 *.Rcheck
+
+# Local copies of the full Kaggle download
+archive.zip
+CFBeattendance.numbers

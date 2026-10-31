@@ -11,3 +11,5 @@
 ^cran-comments\.md$
 ^\.github$
 ^demo-script$
+^archive\.zip$
+^CFBeattendance\.numbers$
