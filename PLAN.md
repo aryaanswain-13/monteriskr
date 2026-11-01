@@ -32,7 +32,14 @@ Out of scope: Shiny, cmdstanr, golem, time series, multiple outcomes.
 - posterior goes back to Imports if any posterior:: call is added.
 
 ## Before CRAN submission
-- [x] Full check with network checks on (win-builder R-devel: 1 NOTE, new submission; R-hub not run)
-- [ ] Maintainer name and email confirmed
+- [x] Full check with network checks on (win-builder R-devel on the final 0.1.0 tarball: 1 NOTE, new submission; R-hub not run)
+- [x] Maintainer name and email confirmed (CRAN confirmation link clicked)
 - [x] Repo public, URL and BugReports in DESCRIPTION
 - [x] Package name availability confirmed (free on CRAN, 2026-10-30)
+- [x] Co-authors added to DESCRIPTION (Sahil Singh, Amrit Pal)
+
+## CRAN submission status
+- [x] monteriskr 0.1.0 submitted 2026-10-31
+- [x] CRAN automated pretests passed (Windows and Debian, R-devel: 1 NOTE, new submission)
+- [ ] Manual inspection by a CRAN team member (reply expected within ~10 working days)
+- [ ] Accepted and published on CRAN
